@@ -1,0 +1,40 @@
+name: daily contribution commit
+
+on:
+  schedule:
+    # 07:23 UTC daily — an off-the-hour minute so it doesn't queue behind
+    # the thousands of jobs everyone schedules for :00.
+    - cron: "23 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Record today's contribution
+        run: |
+          set -euo pipefail
+          echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> contributions.log
+
+      - name: Commit and push
+        env:
+          GIT_AUTHOR_NAME: ${{ vars.CONTRIB_NAME || github.repository_owner }}
+          GIT_AUTHOR_EMAIL: ${{ vars.CONTRIB_EMAIL }}
+          GIT_COMMITTER_NAME: ${{ vars.CONTRIB_NAME || github.repository_owner }}
+          GIT_COMMITTER_EMAIL: ${{ vars.CONTRIB_EMAIL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GIT_AUTHOR_EMAIL}" ]; then
+            echo "::error::Repo variable CONTRIB_EMAIL is not set. Add it in Settings > Secrets and variables > Actions > Variables, using an email verified on your GitHub account, or the commit won't count toward your contribution graph."
+            exit 1
+          fi
+          git add contributions.log
+          git commit -m "chore: daily contribution log $(date -u '+%Y-%m-%d')"
+          git push
