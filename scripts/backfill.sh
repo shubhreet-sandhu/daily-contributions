@@ -9,7 +9,7 @@
 #     ./scripts/backfill.sh
 #
 # Tunables (env vars, all optional):
-#   START_DATE          first date to backfill, YYYY-MM-DD (default: 90 days ago)
+#   START_DATE          first date to backfill, YYYY-MM-DD (default: 21 days ago)
 #   END_DATE             last date to backfill, YYYY-MM-DD (default: yesterday)
 #   SKIP_PROBABILITY    0-100, chance a given day gets zero commits (default: 25)
 #   MAX_COMMITS_PER_DAY  upper bound on commits for an active day (default: 4)
@@ -19,7 +19,7 @@ set -euo pipefail
 : "${GIT_AUTHOR_EMAIL:?Set GIT_AUTHOR_EMAIL to an email verified on your GitHub account}"
 : "${GIT_AUTHOR_NAME:?Set GIT_AUTHOR_NAME to your name}"
 
-START_DATE="${START_DATE:-$(date -v-90d '+%Y-%m-%d' 2>/dev/null || date -d '90 days ago' '+%Y-%m-%d')}"
+START_DATE="${START_DATE:-$(date -v-21d '+%Y-%m-%d' 2>/dev/null || date -d '21 days ago' '+%Y-%m-%d')}"
 END_DATE="${END_DATE:-$(date -v-1d '+%Y-%m-%d' 2>/dev/null || date -d 'yesterday' '+%Y-%m-%d')}"
 SKIP_PROBABILITY="${SKIP_PROBABILITY:-25}"
 MAX_COMMITS_PER_DAY="${MAX_COMMITS_PER_DAY:-4}"
